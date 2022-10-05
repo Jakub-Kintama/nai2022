@@ -4,22 +4,17 @@
 #include <functional>
 #include <cmath>
 using namespace std;
-using calculate = function<double(vector<double>)>;
-using calculations = map<string, calculate>;
-
-void print(calculate calc, vector<double> vals){
-    cout << "wynik: " << calc(vals) << endl;
-}
+using calculate = function<string(vector<string>)>;
 
 int main(int argc, char **argv){
-    calculations["sin"] = [](vector<double> x) {return sin(x[2]);};
-    calculations["add"] = [](vector<double> x) {return x[2] + x[3];};
-    calculations["mod"] = [](vector<double> x) {return (int)x[2] % (int)x[3];};
+    map<string, calculate> calculator;
+    calculator["sin"] = [](vector<string> x){return sin(stod(x[2]));};
+    calculator["add"] = [](vector<string> x){return stod(x[2]) + stod(x[3]);};
+    calculator["mod"] = [](vector<string> x){return stoi(x[2]) % stoi(x[3]);};
     try
     {
         vector<string> arguments(argv, argv + argc);
         auto option = arguments.at(1);
-        print(option, arguments);
     }
     catch(const std::exception& e)
     {
@@ -29,12 +24,6 @@ int main(int argc, char **argv){
 }
 
 /*
-#include <any>
-#include <functional>
-#include <iostream>
-#include <map>
-#include <string>
-#include <vector>
 using mojamapa_t = std::map<std::string, std::string>;
 using mojafunkcja_t = std::function<std::string(std::string)>;
 void wypisz(mojamapa_t mapa, mojafunkcja_t fun) {

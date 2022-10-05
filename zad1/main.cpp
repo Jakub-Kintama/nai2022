@@ -4,7 +4,7 @@
 #include <functional>
 #include <cmath>
 using namespace std;
-using calculate = function<string(vector<string>)>;
+using calculate = function<vector<string>>;
 
 int main(int argc, char **argv){
     map<string, calculate> calculator;
@@ -15,6 +15,8 @@ int main(int argc, char **argv){
     {
         vector<string> arguments(argv, argv + argc);
         auto option = arguments.at(1);
+        calculate fun = calculator.at(option);
+        cout << fun(arguments) << endl;
     }
     catch(const std::exception& e)
     {

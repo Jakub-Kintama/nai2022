@@ -3,14 +3,15 @@
 #include <string>
 #include <functional>
 #include <cmath>
+#include <vector>
 using namespace std;
-using calculate = function<vector<string>>;
+using calculate = function<double(vector<string>)>;
 
 int main(int argc, char **argv){
     map<string, calculate> calculator;
-    calculator["sin"] = [](vector<string> x){return sin(stod(x[2]));};
-    calculator["add"] = [](vector<string> x){return stod(x[2]) + stod(x[3]);};
-    calculator["mod"] = [](vector<string> x){return stoi(x[2]) % stoi(x[3]);};
+    calculator["sin"] = [] (vector<string> x) {return sin(stod(x[2]));};
+    calculator["add"] = [] (vector<string> x) {return stod(x[2]) + stod(x[3]);};
+    calculator["mod"] = [] (vector<string> x) {return stoi(x[2]) % stoi(x[3]);};
     try
     {
         vector<string> arguments(argv, argv + argc);

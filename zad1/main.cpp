@@ -15,8 +15,7 @@ int main(int argc, char **argv){
     try
     {
         vector<string> arguments(argv, argv + argc);
-        auto option = arguments.at(1);
-        calculate fun = calculator.at(option);
+        auto fun = calculator.at(arguments.at(1));
         cout << fun(arguments) << endl;
     }
     catch(const std::exception& e)

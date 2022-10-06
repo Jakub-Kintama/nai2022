@@ -12,15 +12,13 @@ int main(int argc, char **argv){
     calculator["sin"] = [] (vector<string> x) {return sin(stod(x[2]));};
     calculator["add"] = [] (vector<string> x) {return stod(x[2]) + stod(x[3]);};
     calculator["mod"] = [] (vector<string> x) {return stoi(x[2]) % stoi(x[3]);};
-    try
-    {
+    try{
         vector<string> arguments(argv, argv + argc);
         auto fun = calculator.at(arguments.at(1));
         cout << fun(arguments) << endl;
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
+    }catch (std::logic_error e) {
+        cout << "wpisz sin, add lub mod a nastepnie podaj liczby" << endl;
+        return 1;
     }
     return 0;
 }

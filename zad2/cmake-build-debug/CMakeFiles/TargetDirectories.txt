@@ -1,0 +1,3 @@
+Z:/NAI/nai2022/zad2/cmake-build-debug/CMakeFiles/zad2.dir
+Z:/NAI/nai2022/zad2/cmake-build-debug/CMakeFiles/edit_cache.dir
+Z:/NAI/nai2022/zad2/cmake-build-debug/CMakeFiles/rebuild_cache.dir

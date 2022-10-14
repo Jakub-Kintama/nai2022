@@ -16,7 +16,7 @@ int main(int argc, char **argv){
         vector<string> arguments(argv, argv + argc);
         auto fun = calculator.at(arguments.at(1));
         cout << fun(arguments) << endl;
-    }catch (std::logic_error e) {
+    }catch (out_of_range e) {
         cout << "wpisz sin, add lub mod a nastepnie podaj liczby" << endl;
         return 1;
     }

@@ -1,6 +1,16 @@
-C:\Windows\system32\wsl.exe --distribution Ubuntu --exec /bin/bash -c "export CMAKE_COLOR_DIAGNOSTICS=ON && export CLION_IDE=TRUE && export JETBRAINS_IDE=TRUE && cd /mnt/c/Users/Kintama/Desktop/REPOS/nai2022/zad2/cmake-build-release && /usr/local/bin/cmake -DCMAKE_BUILD_TYPE=Release -G 'CodeBlocks - Unix Makefiles' -S /mnt/c/Users/Kintama/Desktop/REPOS/nai2022/zad2 -B /mnt/c/Users/Kintama/Desktop/REPOS/nai2022/zad2/cmake-build-release"
-CMake Error at CMakeLists.txt:1 (cmake_minimum_required):
-  CMake 3.23 or higher is required.  You are running version 3.21.6
-
-
--- Configuring incomplete, errors occurred!
+"C:\Program Files\JetBrains\CLion 2021.2.3\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Release "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2021.2.3/bin/ninja/win/ninja.exe" -G Ninja -S C:\Users\Kintama\Desktop\REPOS\nai2022\zad2 -B C:\Users\Kintama\Desktop\REPOS\nai2022\zad2\cmake-build-release
+-- The C compiler identification is MSVC 19.29.30146.0
+-- The CXX compiler identification is MSVC 19.29.30146.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x86/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x86/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/Users/Kintama/Desktop/REPOS/nai2022/zad2/cmake-build-release

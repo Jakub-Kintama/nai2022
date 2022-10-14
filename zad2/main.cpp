@@ -28,10 +28,40 @@ int main() {
     auto sphere_f = [](double x, double y) {return x*x + y*y;};
     auto booth_f = [](double x, double y){return (x + 2 * y - 7) * (x + 2 * y - 7) + (2 * x + y - 5) * (2 * x + y - 5);};
     auto matyas_f = [](double x, double y){return 0.26 * (x * x + y * y) - 0.48 * x * y;};
-    auto best_sphere = brute_force(sphere_f, -10, 10, 1000);
-    auto best_booth = brute_force(booth_f, -10, 10, 1000);
-    auto best_matyas = brute_force(matyas_f, -10, 10, 1000);
-    cout << "best sphere = " << best_sphere << "\nbest booth = " << best_booth << "\nbest matyas = " << best_matyas << endl;
+    double best_sphere = 0;
+    double best_booth = 0;
+    double best_matyas = 0;
+    double sphere_time, booth_time, matyas_time;
+    int exp = 2048;
+    clock_t start, end;
+
+    start = clock();
+    for(int i=0; i<exp; i++){
+        best_sphere += brute_force(sphere_f, -10, 10, 1000);
+    }
+    end = clock();
+    //sphere_time = double(end-start) / double(CLOCKS_PER_SEC);
+    sphere_time = double(end-start);
+
+    start = clock();
+    for(int i=0; i<exp; i++) {
+        best_booth += brute_force(booth_f, -10, 10, 1000);
+    }
+    end = clock();
+    //booth_time = double(end-start) / double(CLOCKS_PER_SEC);
+    booth_time = double(end-start);
+
+    start = clock();
+    for(int i=0; i<exp; i++) {
+        best_matyas += brute_force(matyas_f, -10, 10, 1000);
+    }
+    end = clock();
+    //matyas_time = double(end-start) / double(CLOCKS_PER_SEC);
+    matyas_time = double(end-start);
+
+    cout << "best sphere = " << best_sphere/exp << " with time = "<< sphere_time/exp << endl;
+    cout << "best booth = " << best_booth/exp << " with time = " << booth_time/exp << endl;
+    cout << "best matyas = " << best_matyas/exp << " with time = " << matyas_time/exp << endl;
     return 0;
 }
 

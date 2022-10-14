@@ -1,20 +1,25 @@
 #include <iostream>
 #include <vector>
-#include <functional>
 #include <random>
 using namespace std;
 
-auto brute_force = [](auto f, auto domain) {
-    auto current_p = domain();
-    auto best_point = current_p;
+random_device rd;
+mt19937 rng(rd());
+
+auto brute_force = [](auto f, auto min, auto max, auto iterations) {
+    uniform_real_distribution<double> dist(min, max);
+    auto current_x = dist(rng);
+    auto current_y = dist(rng);
+    auto best_point = f(current_x, current_y);
     try {
-        while (true) {
-            if (f(current_p) < f(best_point)) {
-                best_point = current_p;
+        for(int i=0; i<iterations; i++) {
+            if (f(current_x, current_y) < best_point) {
+                best_point = f(current_x, current_y);
             }
-            current_p = domain();
+            current_x = dist(rng);
+            current_y = dist(rng);
         }
-    } catch (std::exception &e) {
+    } catch (exception &e) {
     }
     return best_point;
 };
@@ -23,14 +28,10 @@ int main() {
     auto sphere_f = [](double x, double y) {return x*x + y*y;};
     auto booth_f = [](double x, double y){return (x + 2 * y - 7) * (x + 2 * y - 7) + (2 * x + y - 5) * (2 * x + y - 5);};
     auto matyas_f = [](double x, double y){return 0.26 * (x * x + y * y) - 0.48 * x * y;};
-    double current_sphere_x = -10;
-    auto sphere_generator = [&]() {
-        current_sphere_x+= 1.0/128.0;
-        if (current_sphere_x >= 10) throw std::invalid_argument("finished");
-        return current_sphere_x;
-    };
-    auto best_point = brute_force(sphere_f, sphere_generator);
-    std::cout << "best x = " << best_point << std::endl;
+    auto best_sphere = brute_force(sphere_f, -10, 10, 1000);
+    auto best_booth = brute_force(booth_f, -10, 10, 1000);
+    auto best_matyas = brute_force(matyas_f, -10, 10, 1000);
+    cout << "best sphere = " << best_sphere << "\nbest booth = " << best_booth << "\nbest matyas = " << best_matyas << endl;
     return 0;
 }
 

@@ -1,16 +1,37 @@
-"C:\Program Files\JetBrains\CLion 2021.2.3\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2021.2.3/bin/ninja/win/ninja.exe" -G Ninja -S C:\Users\Kintama\Desktop\REPOS\nai2022\zad2 -B C:\Users\Kintama\Desktop\REPOS\nai2022\zad2\cmake-build-debug
--- The C compiler identification is MSVC 19.29.30146.0
--- The CXX compiler identification is MSVC 19.29.30146.0
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working C compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x86/cl.exe - skipped
--- Detecting C compile features
--- Detecting C compile features - done
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x86/cl.exe - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Configuring done
--- Generating done
--- Build files have been written to: C:/Users/Kintama/Desktop/REPOS/nai2022/zad2/cmake-build-debug
+"C:\Program Files\JetBrains\CLion 2022.2.1\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - MinGW Makefiles" -S Z:\NAI\nai2022\zad2 -B Z:\NAI\nai2022\zad2\cmake-build-debug
+-- The C compiler identification is GNU 11.2.0
+CMake Error: Could not find cmake module file: Z:/NAI/nai2022/zad2/cmake-build-debug/CMakeFiles/3.23.2/CMakeCXXCompiler.cmake
+CMake Error: Could not find cmake module file: Z:/NAI/nai2022/zad2/cmake-build-debug/CMakeFiles/3.23.2/CMakeRCCompiler.cmake
+CMake Error at C:/Program Files/JetBrains/CLion 2022.2.1/bin/cmake/win/share/cmake-3.23/Modules/Platform/Windows-GNU.cmake:130 (enable_language):
+  No CMAKE_RC_COMPILER could be found.
+
+  Tell CMake where to find the compiler by setting the CMake cache entry
+  CMAKE_RC_COMPILER to the full path to the compiler, or to the compiler name
+  if it is in the PATH.
+Call Stack (most recent call first):
+  C:/Program Files/JetBrains/CLion 2022.2.1/bin/cmake/win/share/cmake-3.23/Modules/Platform/Windows-GNU-C.cmake:2 (__windows_compiler_gnu)
+  C:/Program Files/JetBrains/CLion 2022.2.1/bin/cmake/win/share/cmake-3.23/Modules/CMakeCInformation.cmake:48 (include)
+  CMakeLists.txt:2 (project)
+
+
+CMake Error at C:/Program Files/JetBrains/CLion 2022.2.1/bin/cmake/win/share/cmake-3.23/Modules/CMakeRCInformation.cmake:14 (get_filename_component):
+  get_filename_component called with incorrect number of arguments
+Call Stack (most recent call first):
+  C:/Program Files/JetBrains/CLion 2022.2.1/bin/cmake/win/share/cmake-3.23/Modules/Platform/Windows-GNU.cmake:130 (enable_language)
+  C:/Program Files/JetBrains/CLion 2022.2.1/bin/cmake/win/share/cmake-3.23/Modules/Platform/Windows-GNU-C.cmake:2 (__windows_compiler_gnu)
+  C:/Program Files/JetBrains/CLion 2022.2.1/bin/cmake/win/share/cmake-3.23/Modules/CMakeCInformation.cmake:48 (include)
+  CMakeLists.txt:2 (project)
+
+
+CMake Error: CMAKE_RC_COMPILER not set, after EnableLanguage
+CMake Error at CMakeLists.txt:2 (project):
+  No CMAKE_CXX_COMPILER could be found.
+
+  Tell CMake where to find the compiler by setting the CMake cache entry
+  CMAKE_CXX_COMPILER to the full path to the compiler, or to the compiler
+  name if it is in the PATH.
+
+
+CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage
+-- Configuring incomplete, errors occurred!
+See also "Z:/NAI/nai2022/zad2/cmake-build-debug/CMakeFiles/CMakeOutput.log".

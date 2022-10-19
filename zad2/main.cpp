@@ -32,7 +32,7 @@ int main() {
     double best_booth = 0;
     double best_matyas = 0;
     double sphere_time, booth_time, matyas_time;
-    int exp = 2048;
+    int exp = 4096;
     clock_t start, end;
 
     start = clock();

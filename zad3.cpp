@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <string>
 #include <list>
 using namespace std;
 
@@ -22,25 +23,42 @@ auto brute_force = [](auto f, auto min, auto max, auto iterations) {
     return best_point;
 };
 
+auto true_brute_force = [](auto f, auto min, auto max, auto precision) {
+    auto current_x = min;
+    auto current_y = min;
+    auto best_point = f(current_x, current_y);
+    while (current_x < max){
+        while (current_y < max){
+            if(f(current_x, current_y) < best_point){best_point = f(current_x, current_y);}
+            current_y += precision;
+        }
+        current_x += precision;
+    }
+    return best_point;
+};
+
 auto simulated_annealing = [](auto f, auto min, auto max, auto iterations){
     uniform_real_distribution<double> dist(min, max);
     uniform_real_distribution<double> uk(0, 1);
     auto current_x = dist(rng);
     auto current_y = dist(rng);
     auto best_point = f(current_x, current_y);
-    //list<double> my_list = {best_point};
+    list<double> my_list = {best_point};
     double tk;
-    for(int i=0; i<iterations; i++) {
-        tk = f(current_x - i, current_y - i);
-        if (best_point < tk){
+    for(int i=0; i < iterations; i++) {
+        tk = f(dist(rng), dist(rng));
+        if (tk < best_point){
             best_point = tk;
-            //my_list.insert(best_point);
+            my_list.push_back(best_point);
         }else{
             if(uk(rng) < exp( - abs(best_point - tk) * log(i))){
                 best_point = tk;
-                //my_list.insert(best_point);
+                my_list.push_back(best_point);
             }
         }
+    }
+    for (auto point : my_list) {
+        if(point < best_point){best_point = point;}
     }
     return best_point;
 };
@@ -88,7 +106,19 @@ int main() {
         best_matyas += brute_force(matyas_f, -10, 10, 1000);
     }
     end = clock();
-    cout << "camel " << best_camel/exp << ", himmelblau " << best_himmelblau/exp << ", matyas " << best_matyas/exp << ", for brute force with time = " << double(end-start)/exp << endl;
+    string text = "camel " + to_string(best_camel/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_matyas/exp) + ", for brute force with time = " + to_string(double(end-start)/exp) + "\n";
+    best_camel = 0;
+    best_himmelblau = 0;
+    best_matyas = 0;
+
+    start = clock();
+    for(int i=0; i<exp; i++) {
+        best_camel += true_brute_force(camel_f, -5, 5, 1);
+        best_himmelblau += true_brute_force(himmelblau_f, -5, 5, 1);
+        best_matyas += true_brute_force(matyas_f, -10, 10, 1);
+    }
+    end = clock();
+    text += "camel " + to_string(best_camel/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_matyas/exp) + ", for real brute force with time = " + to_string(double(end-start)/exp) + "\n";
     best_camel = 0;
     best_himmelblau = 0;
     best_matyas = 0;
@@ -100,7 +130,7 @@ int main() {
         best_matyas += simulated_annealing(matyas_f, -10, 10, 1000);
     }
     end = clock();
-    cout << "camel " << best_camel/exp << ", himmelblau " << best_himmelblau/exp << ", matyas " << best_matyas/exp << ", for simulated annealing with time = " << double(end-start)/exp << endl;
+    text += "camel " + to_string(best_camel/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_matyas/exp) + ", for simulated annealing with time = " + to_string(double(end-start)/exp) + "\n";
     best_camel = 0;
     best_himmelblau = 0;
     best_matyas = 0;
@@ -112,39 +142,8 @@ int main() {
         best_matyas += hill_climb(matyas_f, -10, 10, 1000);
     }
     end = clock();
-    cout << "camel " << best_camel/exp << ", himmelblau " << best_himmelblau/exp << ", matyas " << best_matyas/exp << ", for hill climb with time = " << double(end-start)/exp << endl;
+    text += "camel " + to_string(best_camel/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_matyas/exp) + ", for hill climb with time = " + to_string(double(end-start)/exp) + "\n";
+    cout << text;
 
     return 0;
 }
-
-/*
-domain_t tabu_method(
-        const std::function<double(domain_t)> &f, domain_t start_point,
-        std::function<std::vector<domain_t>(domain_t)> get_close_points,
-        int max_iterations) {
-    using namespace std;
-    domain_t best_point = start_point;
-    list<domain_t> tabu_list = {start_point};
-    for (int iteration = 0; iteration < max_iterations; iteration++) {
-        cout << iteration << " " << tabu_list.back() << " " << f(tabu_list.back())
-             << endl;
-        for (auto tabu_i = tabu_list.rbegin(); tabu_i != tabu_list.rend();
-             tabu_i++) {
-            auto close_points_all = get_close_points(*tabu_i);
-            vector<domain_t> close_points;
-            copy_if(close_points_all.begin(), close_points_all.end(),
-                    back_inserter(close_points), [&](auto p) {
-                        return !count(tabu_list.begin(), tabu_list.end(), p);
-                    });
-            if (close_points.size() != 0) {
-                tabu_list.push_back(
-                        *min_element(close_points.begin(), close_points.end(),
-                                     [f](auto a, auto b) { return f(a) < f(b); }));
-                break;
-            }
-        }
-        if (f(best_point) > f(tabu_list.back())) best_point = tabu_list.back();
-    }
-    return best_point;
-}
-*/

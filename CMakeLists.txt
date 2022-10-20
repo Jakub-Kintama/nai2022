@@ -4,4 +4,6 @@ project(nai2022)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(nai2022
-        zad1/main.cpp)
+        zad1.cpp
+        zad2.cpp
+        zad3.cpp)

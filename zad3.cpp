@@ -28,18 +28,44 @@ auto simulated_annealing = [](auto f, auto min, auto max, auto iterations){
     auto current_x = dist(rng);
     auto current_y = dist(rng);
     auto best_point = f(current_x, current_y);
-    list<double> my_list = {best_point};
+    //list<double> my_list = {best_point};
     double tk;
     for(int i=0; i<iterations; i++) {
         tk = f(current_x - i, current_y - i);
         if (best_point < tk){
             best_point = tk;
-            my_list.insert(best_point);
+            //my_list.insert(best_point);
         }else{
-            if(uk < exp( - abs(best_point - tk) * log(i))){
+            if(uk(rng) < exp( - abs(best_point - tk) * log(i))){
                 best_point = tk;
-                my_list.insert(best_point);
+                //my_list.insert(best_point);
             }
+        }
+    }
+    return best_point;
+};
+
+auto hill_climb = [](auto f, auto min, auto max, auto iterations) {
+    uniform_real_distribution<double> dist(min, max);
+    auto current_x = dist(rng);
+    auto current_y = dist(rng);
+    auto best_point = f(current_x, current_y);
+    double new_point = 0;
+    double new_x, new_y;
+    for(int i=0; i<iterations; i++) {
+        for (int j=0; j < max; j++) {
+            uniform_real_distribution<double> dist_2(-1/128,1/128);
+            new_x = dist(rng) + dist_2(rng);
+            new_y = dist(rng) + dist_2(rng);
+            if(f(new_x, new_y) < best_point){
+                new_point = f(new_x, new_y);
+            } else{
+                break;
+            }
+        }
+
+        if(new_point < best_point){
+            best_point = new_point;
         }
     }
     return best_point;
@@ -49,7 +75,9 @@ int main() {
     auto camel_f = [](double x, double y) {return 2 * x * x - 1.05 * pow(x, 4) + pow(x, 6) / 6 + x * y + y * y;};
     auto himmelblau_f = [](double x, double y){return (x + 2 * y - 7) * (x + 2 * y - 7) + (2 * x + y - 5) * (2 * x + y - 5);};
     auto matyas_f = [](double x, double y){return 0.26 * (x * x + y * y) - 0.48 * x * y;};
-    double best_camel, best_himmelblau, best_matyas = 0;
+    double best_camel = 0;
+    double best_himmelblau = 0;
+    double best_matyas = 0;
     int exp = 2048;
     clock_t start, end;
 
@@ -60,31 +88,31 @@ int main() {
         best_matyas += brute_force(matyas_f, -10, 10, 1000);
     }
     end = clock();
-    cout << "best camel " << best_camel/exp << "best himmelblau " << best_himmelblau/exp << "best matyas " << best_matyas/exp << " with time = " << double(end-start)/exp << endl;
+    cout << "camel " << best_camel/exp << ", himmelblau " << best_himmelblau/exp << ", matyas " << best_matyas/exp << ", for brute force with time = " << double(end-start)/exp << endl;
     best_camel = 0;
     best_himmelblau = 0;
     best_matyas = 0;
 
     start = clock();
     for(int i=0; i<exp; i++) {
-        best_camel += brute_force(camel_f, -5, 5, 1000);
-        best_himmelblau += brute_force(himmelblau_f, -5, 5, 1000);
-        best_matyas += brute_force(matyas_f, -10, 10, 1000);
+        best_camel += simulated_annealing(camel_f, -5, 5, 1000);
+        best_himmelblau += simulated_annealing(himmelblau_f, -5, 5, 1000);
+        best_matyas += simulated_annealing(matyas_f, -10, 10, 1000);
     }
     end = clock();
-    cout << "best camel " << best_camel/exp << "best himmelblau " << best_himmelblau/exp << "best matyas " << best_matyas/exp << " with time = " << double(end-start)/exp << endl;
+    cout << "camel " << best_camel/exp << ", himmelblau " << best_himmelblau/exp << ", matyas " << best_matyas/exp << ", for simulated annealing with time = " << double(end-start)/exp << endl;
     best_camel = 0;
     best_himmelblau = 0;
     best_matyas = 0;
 
     start = clock();
     for(int i=0; i<exp; i++) {
-        best_camel += brute_force(camel_f, -5, 5, 1000);
-        best_himmelblau += brute_force(himmelblau_f, -5, 5, 1000);
-        best_matyas += brute_force(matyas_f, -10, 10, 1000);
+        best_camel += hill_climb(camel_f, -5, 5, 1000);
+        best_himmelblau += hill_climb(himmelblau_f, -5, 5, 1000);
+        best_matyas += hill_climb(matyas_f, -10, 10, 1000);
     }
     end = clock();
-    cout << "best camel " << best_camel/exp << "best himmelblau " << best_himmelblau/exp << "best matyas " << best_matyas/exp << " with time = " << double(end-start)/exp << endl;
+    cout << "camel " << best_camel/exp << ", himmelblau " << best_himmelblau/exp << ", matyas " << best_matyas/exp << ", for hill climb with time = " << double(end-start)/exp << endl;
 
     return 0;
 }

@@ -68,15 +68,17 @@ auto hill_climb = [](auto f, auto min, auto max, auto iterations) {
     auto current_x = dist(rng);
     auto current_y = dist(rng);
     auto best_point = f(current_x, current_y);
-    double new_point = 0;
-    double new_x, new_y;
+    double new_point;
     for(int i=0; i<iterations; i++) {
+        current_x = dist(rng);
+        current_y = dist(rng);
+        new_point = f(current_x, current_y);
         for (int j=0; j < max; j++) {
             uniform_real_distribution<double> dist_2(-1/128,1/128);
-            new_x = dist(rng) + dist_2(rng);
-            new_y = dist(rng) + dist_2(rng);
-            if(f(new_x, new_y) < best_point){
-                new_point = f(new_x, new_y);
+            current_x += dist_2(rng);
+            current_y += dist_2(rng);
+            if(f(current_x, current_y) < new_point){
+                new_point = f(current_x, current_y);
             } else{
                 break;
             }

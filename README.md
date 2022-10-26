@@ -8,5 +8,5 @@ camel 0.041717, himmelblau 0.099924, matyas 0.013326, for simulated annealing wi
 camel 0.041175, himmelblau 0.095742, matyas 0.012487, for hill climb with time = 1.198730 <br>
 <br>
 Dla brute force czas uzyskania wyniku zblizonego do pozostałych trwał by ponad 15 minut (dłużej nie czekałem), dlatego zupełnie się nie nadaje. <br>
-Najszybszy jest algorytm symulowanego wyżarzania, czas pogramu jest krótszy od hill climb dzieki zastosowaniu "temperatury". <br>
+Najszybszy jest losowy brute force, mimo niejednostajnej dokładności wyników po wyciągnieciu średniej jest on najbliższy idealnego wyniku. <br>
 

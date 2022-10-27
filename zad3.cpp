@@ -1,9 +1,11 @@
+/*
 #include <iostream>
-#include <vector>
 #include <random>
 #include <string>
 #include <list>
+#include <cmath>
 using namespace std;
+#define M_PI 3.14159265358979323846
 
 random_device rd;
 mt19937 rng(rd());
@@ -92,60 +94,61 @@ auto hill_climb = [](auto f, auto min, auto max, auto iterations) {
 };
 
 int main() {
-    auto camel_f = [](double x, double y) {return 2 * x * x - 1.05 * pow(x, 4) + pow(x, 6) / 6 + x * y + y * y;};
+    auto ackley_f = [](double x, double y) {return -20 * exp(-0.2 * sqrt(0.5 * x * x + y * y)) - exp(0.5 * (cos(2 * M_PI * x) + cos(2 * M_PI * y))) + exp(1) + 20;};
     auto himmelblau_f = [](double x, double y){return (x + 2 * y - 7) * (x + 2 * y - 7) + (2 * x + y - 5) * (2 * x + y - 5);};
-    auto matyas_f = [](double x, double y){return 0.26 * (x * x + y * y) - 0.48 * x * y;};
-    double best_camel = 0;
+    auto eggholder_f = [](double x, double y){return -(y + 47) * sin(sqrt(abs(x/2 + y + 47))) - x * sin(sqrt(abs(x - (y + 47))));};
+    double best_ackley = 0;
     double best_himmelblau = 0;
-    double best_matyas = 0;
+    double best_eggholder = 0;
     int exp = 2048;
     clock_t start, end;
 
     start = clock();
     for(int i=0; i<exp; i++){
-        best_camel += brute_force(camel_f, -5, 5, 1000);
+        best_ackley += brute_force(ackley_f, -5, 5, 1000);
         best_himmelblau += brute_force(himmelblau_f, -5, 5, 1000);
-        best_matyas += brute_force(matyas_f, -10, 10, 1000);
+        best_eggholder += brute_force(eggholder_f, -512, 512, 1000);
     }
     end = clock();
-    string text = "camel " + to_string(best_camel/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_matyas/exp) + ", for brute force with time = " + to_string(double(end-start)/exp) + "\n";
-    best_camel = 0;
+    string text = "ackley " + to_string(best_ackley/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_eggholder/exp) + ", for brute force with time = " + to_string(double(end-start)/exp) + "\n";
+    best_ackley = 0;
     best_himmelblau = 0;
-    best_matyas = 0;
+    best_eggholder = 0;
 
     start = clock();
     for(int i=0; i<exp; i++) {
-        best_camel += true_brute_force(camel_f, -5, 5, 1);
+        best_ackley += true_brute_force(ackley_f, -5, 5, 1);
         best_himmelblau += true_brute_force(himmelblau_f, -5, 5, 1);
-        best_matyas += true_brute_force(matyas_f, -10, 10, 1);
+        best_eggholder += true_brute_force(eggholder_f, -512, 512, 1);
     }
     end = clock();
-    text += "camel " + to_string(best_camel/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_matyas/exp) + ", for real brute force with time = " + to_string(double(end-start)/exp) + "\n";
-    best_camel = 0;
+    text += "ackley " + to_string(best_ackley/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_eggholder/exp) + ", for real brute force with time = " + to_string(double(end-start)/exp) + "\n";
+    best_ackley = 0;
     best_himmelblau = 0;
-    best_matyas = 0;
+    best_eggholder = 0;
 
     start = clock();
     for(int i=0; i<exp; i++) {
-        best_camel += simulated_annealing(camel_f, -5, 5, 1000);
+        best_ackley += simulated_annealing(ackley_f, -5, 5, 1000);
         best_himmelblau += simulated_annealing(himmelblau_f, -5, 5, 1000);
-        best_matyas += simulated_annealing(matyas_f, -10, 10, 1000);
+        best_eggholder += simulated_annealing(eggholder_f, -512, 512, 1000);
     }
     end = clock();
-    text += "camel " + to_string(best_camel/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_matyas/exp) + ", for simulated annealing with time = " + to_string(double(end-start)/exp) + "\n";
-    best_camel = 0;
+    text += "ackley " + to_string(best_ackley/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_eggholder/exp) + ", for simulated annealing with time = " + to_string(double(end-start)/exp) + "\n";
+    best_ackley = 0;
     best_himmelblau = 0;
-    best_matyas = 0;
+    best_eggholder = 0;
 
     start = clock();
     for(int i=0; i<exp; i++) {
-        best_camel += hill_climb(camel_f, -5, 5, 1000);
+        best_ackley += hill_climb(ackley_f, -5, 5, 1000);
         best_himmelblau += hill_climb(himmelblau_f, -5, 5, 1000);
-        best_matyas += hill_climb(matyas_f, -10, 10, 1000);
+        best_eggholder += hill_climb(eggholder_f, -512, 512, 1000);
     }
     end = clock();
-    text += "camel " + to_string(best_camel/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_matyas/exp) + ", for hill climb with time = " + to_string(double(end-start)/exp) + "\n";
+    text += "ackley " + to_string(best_ackley/exp) + ", himmelblau " + to_string(best_himmelblau/exp) + ", matyas " + to_string(best_eggholder/exp) + ", for hill climb with time = " + to_string(double(end-start)/exp) + "\n";
     cout << text;
 
     return 0;
 }
+ */

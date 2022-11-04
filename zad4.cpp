@@ -54,25 +54,108 @@ chromosome_t mutation_empty(chromosome_t parents, double p_mutation) {
     return parents;
 }
 
+auto get_crossover_one_point = [](auto pop, double p_crossover = 0.9) {
+    auto crossover_one_point = [p_crossover](decltype(pop) population) {
+        decltype(pop) ret_pop;
+        std::uniform_real_distribution<double> r_pcross(0.0, 1.0);
+        for (int i = 0; i < (population.size() - 1); i += 2)
+        {
+            auto a = population.at(i);
+            auto b = population.at(i + 1);
+
+            if (r_pcross(mt_generator) < p_crossover)
+            {
+                std::uniform_int_distribution<int> dist(0, a.chromosome.size() - 1);
+                auto crossover_p = dist(mt_generator);
+                for (int g = crossover_p; g < a.chromosome.size(); g++)
+                {
+                    std::swap(a.chromosome[g], b.chromosome[g]);
+                }
+            }
+            ret_pop.push_back(a);
+            ret_pop.push_back(b);
+        }
+        return ret_pop;
+    };
+    return crossover_one_point;
+};
+
+auto get_selection_roulette = [](auto pop) {
+    auto selection_roulette = [](auto population) {
+        using namespace std;
+        decltype(population) selected_specimens;
+        double sum_fitness = accumulate(population.begin(), population.end(), 0.0, [](auto a, auto b) { return a + b.fit; });
+
+        uniform_real_distribution<double> dist(0.0, sum_fitness);
+        for (int c = 0; c < population.size(); c++)
+        {
+            double r = dist(mt_generator);
+            double s = 0.0;
+            for (unsigned int i = 0; i < population.size(); i++)
+            {
+                s += population[i].fit;
+                if (r < s)
+                {
+                    selected_specimens.push_back(population.at(i));
+                    break;
+                }
+            }
+        }
+        return selected_specimens;
+    };
+    return selection_roulette;
+};
+
+auto get_mutation_probabilitic = [](auto pop, double p_mutation = 0.1) {
+    auto mutation_probabilitic = [p_mutation](decltype(pop) population) {
+        decltype(pop) ret_pop;
+        std::uniform_real_distribution<double> r_mut(0.0, 1.0);
+        for (int i = 0; i < population.size(); i++)
+        {
+            auto a = population.at(i);
+            for (int l = 0; l < a.chromosome.size(); l++)
+            {
+                if (r_mut(mt_generator) < p_mutation)
+                {
+                    a.chromosome[l] = 1 - a.chromosome[l];
+                }
+            }
+            ret_pop.push_back(a);
+        }
+        return ret_pop;
+    };
+    return mutation_probabilitic;
+};
+
 double ackley_f(double x, double y) {
     return -20 * exp(-0.2 * sqrt(0.5 * x * x + y * y)) - exp(0.5 * (cos(2 * M_PI * x) + cos(2 * M_PI * y))) + exp(1) + 20;
 };
 
-pair<double, double> decode(vector<bool> genotype) {
-    double x = 0.0;
-    double y = 0.0;
-    for (int i = 0; i < genotype.chromosome.size() / 2; i++)
+struct genotype{
+    vector<bool> chromosome;
+};
+
+pair<double, double> decode(genotype gen) {
+    double x = 0;
+    double y = 0;
+    for (int i = 0; i < gen.chromosome.size() / 2; i++)
     {
-        x = x * 2 + genotype.chromosome[i];
+        x = x * 2 + gen.chromosome[i];
     }
-    for (int i = genotype.chromosome.size() / 2; i < genotype.chromosome.size(); i++)
+    for (int i = gen.chromosome.size() / 2; i < gen.chromosome.size(); i++)
     {
-        y = y * 2 + genotype.chromosome[i];
+        y = y * 2 + gen.chromosome[i];
     }
 
-    x = x / pow(2.0, (genotype.chromosome.size() / 2 - 4)) - 8;
-    y = y / pow(2.0, (genotype.chromosome.size() / 2 - 4)) - 8;
+    x = x / pow(2.0, (gen.chromosome.size() / 2 - 4)) - 8;
+    y = y / pow(2.0, (gen.chromosome.size() / 2 - 4)) - 8;
     return {x, y};
+}
+
+double fitness(genotype gen)
+{
+    auto [x, y] = decode(gen);
+    return 1.0 / (1.0 + std::abs(ackley_f(x, y)));
 }
 
 int main() {

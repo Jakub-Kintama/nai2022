@@ -1,0 +1,1 @@
+CMakeLists.txt not found in C:\Users\Kintama\Desktop\REPOS\nai2022\zad2 Select CMakeLists.txt

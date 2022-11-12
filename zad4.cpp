@@ -9,7 +9,7 @@ using namespace std;
 random_device rd;
 mt19937 mt_generator(rd());
 
-using chromosome_t = vector<int>;
+using chromosome_t = vector<bool>;
 using population_t = vector<chromosome_t>;
 using fitness_f = function<double(const chromosome_t &)>;
 using term_condition_f = function<bool(const population_t &, const vector<double> &)>;
@@ -83,7 +83,7 @@ chromosome_t mutation_one_point(const chromosome_t parent, double p_mutation) {
         auto l = locus(mt_generator);
         child[l] = 1 - child[l];
         return child;
-    } else
+    }else
         return parent;
 }
 
@@ -96,25 +96,29 @@ pair<double, double> decode(chromosome_t chromosome) {
     double y = 0;
     for (int i = 0; i < chromosome.size() / 2; i++)
     {
-        x *= 2 + chromosome[i];
+        x += chromosome[i] / 10;
     }
     for (int i = chromosome.size() / 2; i < chromosome.size(); i++)
     {
-        y *= 2 + chromosome[i];
+        y += chromosome[i] / 10;
     }
+    x -= 0,5;
+    y -= 0,5;
     return {x, y};
 }
 
 auto get_fitness_f = [](chromosome_t chromosome){
-    auto [x, y] = decode(chromosome);
-    return 1.0 / (1.0 + abs(ackley_f(x, y)));
+    auto pair = decode(chromosome);
+    return 1.0 / (1.0 + abs(ackley_f(pair.first, pair.second)));
 };
 
 chromosome_t generate_chromosome(int chromosome_size){
-    uniform_real_distribution<double> dist(0.0, 1.0);
+    uniform_real_distribution<double> dist(0, 1);
     chromosome_t chromosome;
+    bool temp = 0;
     for(int i=0; i<chromosome_size; i++){
-        chromosome.push_back(dist(mt_generator));
+        if(dist(mt_generator) < 0.5){temp = 0;}else{temp = 1;}
+        chromosome.push_back(temp);
     }
     return chromosome;
 }
@@ -127,30 +131,28 @@ population_t generate_population(int population_size, int chromosome_size){
     return population;
 }
 
-int main() {
-    using namespace std;
-    population_t population = generate_population(10, 110); // 100 + (22835 % 10) * 2) = 110
+void print_population(population_t population){
     for (chromosome_t chromosome: population) {
         cout << "[";
         for (int p: chromosome) {
             cout << p;
         }
-        cout << "] ";
+        cout << "]\n";
     }
-    cout << "\nProcessing...\n";
+    cout << endl;
+}
+
+int main() {
+    using namespace std;
+    population_t population = generate_population(3, 110); // 100 + (22835 % 10) * 2) = 110
+    print_population(population);
+    cout << "Genetic:\n";
     auto result = genetic_algorithm(population,
                                     get_fitness_f,
                                     [](auto a, auto b) { return true; },
                                     selection_tournament_2,
                                     1.0, crossover_two_point,
                                     0.01, mutation_one_point);
-    for (chromosome_t chromosome: result) {
-        cout << "[";
-        for (int p: chromosome) {
-            cout << p;
-        }
-        cout << "] ";
-    }
-    cout << endl;
+    print_population(result);
     return 0;
 }

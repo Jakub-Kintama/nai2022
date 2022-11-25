@@ -35,7 +35,7 @@ population_t genetic_algorithm(population_t initial_population,
         transform(population_fit.begin(), population_fit.end(),
                   parents_indexes.begin(),
                   [&](auto e) { return selection(population_fit); });
-        // perform crossover operations
+        // perform crossover
         for (int i = 0; i < parents_indexes.size() - 1; i += 2) {
             vector<chromosome_t> offspring = {population[parents_indexes[i]], population[parents_indexes[i + 1]]};
             if (uniform(mt_generator) < p_crossover) {
@@ -44,12 +44,12 @@ population_t genetic_algorithm(population_t initial_population,
             new_population[i] = offspring[0];
             new_population[i + 1] = offspring[1];
         }
+        // perform mutation
         for (auto &chromosome : new_population) {
             chromosome = mutation(chromosome, p_mutation);
         }
         population = new_population;
-        transform(population.begin(), population.end(), population_fit.begin(),
-                       fitness);
+        transform(population.begin(), population.end(), population_fit.begin(), fitness);
     }
     return population;
 };
@@ -104,22 +104,22 @@ pair<double, double> decode(chromosome_t chromosome) {
         y += chromosome[i];
         y /= 10;
     }
-    x -= 0,5; //cap max value to 5.0 => 110 / 2 = 55, 55 / 10 = 5.5, 5.5 - 0.5 = 5.0
-    y -= 0,5;
+    x -= 0.5; //cap max value to 5.0 => 110 / 2 = 55, 55 / 10 = 5.5, 5.5 - 0.5 = 5.0
+    y -= 0.5;
     return {x, y};
 }
 
 auto get_fitness_f = [](chromosome_t chromosome){
     pair<double, double> pair = decode(chromosome);
-    return 1.0 / abs(ackley_f(pair.first, pair.second));
+    return 1.0 / 1.0 + abs(ackley_f(pair.first, pair.second));
 };
 
 chromosome_t generate_chromosome(int chromosome_size){
-    uniform_real_distribution<double> dist(0, 1);
+    uniform_real_distribution<double> dist(0, 10);
     chromosome_t chromosome;
-    int temp = 0;
+    int temp;
     for(int i=0; i<chromosome_size; i++){
-        if(dist(mt_generator) < 0.5){temp = 0;}else{temp = 1;}
+        if(dist(mt_generator) < 5){temp = 0;}else{temp = 1;}
         chromosome.push_back(temp);
     }
     return chromosome;
@@ -154,7 +154,6 @@ population_t test(population_t population, int iterations, double p_crossover, d
                                     [iterations](auto a, auto b) {
                                         static int i = 1;
                                         i++;
-                                        // cout << i << ": " << make_pair(a, fitness_function) << endl;
                                         return i > iterations;
                                         },
                                     selection_tournament_2,

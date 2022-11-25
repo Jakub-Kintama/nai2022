@@ -96,26 +96,28 @@ pair<double, double> decode(chromosome_t chromosome) {
     double y = 0;
     for (int i = 0; i < chromosome.size() / 2; i++)
     {
-        x += chromosome[i] / 10;
+        x += chromosome[i];
+        x /= 10;
     }
     for (int i = chromosome.size() / 2; i < chromosome.size(); i++)
     {
-        y += chromosome[i] / 10;
+        y += chromosome[i];
+        y /= 10;
     }
-    x -= 0,5;
+    x -= 0,5; //cap max value to 5.0 => 110 / 2 = 55, 55 / 10 = 5.5, 5.5 - 0.5 = 5.0
     y -= 0,5;
     return {x, y};
 }
 
 auto get_fitness_f = [](chromosome_t chromosome){
-    auto pair = decode(chromosome);
-    return 1.0 / (1.0 + abs(ackley_f(pair.first, pair.second)));
+    pair<double, double> pair = decode(chromosome);
+    return 1.0 / abs(ackley_f(pair.first, pair.second));
 };
 
 chromosome_t generate_chromosome(int chromosome_size){
     uniform_real_distribution<double> dist(0, 1);
     chromosome_t chromosome;
-    bool temp = 0;
+    int temp = 0;
     for(int i=0; i<chromosome_size; i++){
         if(dist(mt_generator) < 0.5){temp = 0;}else{temp = 1;}
         chromosome.push_back(temp);
@@ -131,28 +133,48 @@ population_t generate_population(int population_size, int chromosome_size){
     return population;
 }
 
-void print_population(population_t population){
+void print_population(population_t population, fitness_f fitness){
+    cout << endl;
     for (chromosome_t chromosome: population) {
         cout << "[";
         for (int p: chromosome) {
             cout << p;
         }
-        cout << "]\n";
+        cout << "]";
+        if(fitness){
+            cout << fitness(chromosome);
+        }
+        cout << endl;
     }
-    cout << endl;
 }
 
-int main() {
-    using namespace std;
-    population_t population = generate_population(3, 110); // 100 + (22835 % 10) * 2) = 110
-    print_population(population);
-    cout << "Genetic:\n";
+population_t test(population_t population, int iterations, double p_crossover, double p_mutation, int print_switch){
     auto result = genetic_algorithm(population,
                                     get_fitness_f,
                                     [](auto a, auto b) { return true; },
                                     selection_tournament_2,
-                                    1.0, crossover_two_point,
-                                    0.01, mutation_one_point);
-    print_population(result);
+                                    p_crossover, crossover_two_point,
+                                    p_mutation, mutation_one_point);
+    return result;
+}
+
+int main() {
+    int population_size, iterations, print_switch;
+    double p_crossover, p_mutation;
+    cout << "Population size:";
+    cin >> population_size;
+    cout << "Iterations:";
+    cin >> iterations;
+    cout << "Crossover probability:";
+    cin >> p_crossover;
+    cout << "Mutation probability:";
+    cin >> p_mutation;
+    cout << "Print (1/0):";
+    cin >> print_switch;
+
+    population_t population = generate_population(population_size, 110); // 100 + (22835 % 10) * 2) = 110
+    print_population(population, get_fitness_f);
+    print_population(test(population, iterations, p_crossover, p_mutation, print_switch), get_fitness_f);
+
     return 0;
 }

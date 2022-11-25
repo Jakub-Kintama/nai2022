@@ -23,7 +23,6 @@ population_t genetic_algorithm(population_t initial_population,
                                selection_f selection, double p_crossover,
                                crossover_f crossover, double p_mutation,
                                mutation_f mutation) {
-    using namespace std;
     uniform_real_distribution<double> uniform(0.0, 1.0);
     auto population = initial_population;
     vector<double> population_fit(population.size());
@@ -37,12 +36,12 @@ population_t genetic_algorithm(population_t initial_population,
                   [&](auto e) { return selection(population_fit); });
         // perform crossover
         for (int i = 0; i < parents_indexes.size() - 1; i += 2) {
-            vector<chromosome_t> offspring = {population[parents_indexes[i]], population[parents_indexes[i + 1]]};
+            vector<chromosome_t> child = {population[parents_indexes[i]], population[parents_indexes[i + 1]]};
             if (uniform(mt_generator) < p_crossover) {
-                offspring = crossover(offspring);
+                child = crossover(child);
             }
-            new_population[i] = offspring[0];
-            new_population[i + 1] = offspring[1];
+            new_population[i] = child[0];
+            new_population[i + 1] = child[1];
         }
         // perform mutation
         for (auto &chromosome : new_population) {
@@ -55,7 +54,6 @@ population_t genetic_algorithm(population_t initial_population,
 };
 
 vector<chromosome_t> crossover_two_point(vector<chromosome_t> parents) {
-    using namespace std;
     uniform_int_distribution<int> locus(0,parents.at(0).size()-1);
     int a = locus(mt_generator);
     int b = locus(mt_generator);
@@ -75,13 +73,12 @@ int selection_tournament_2(vector<double> fitnesses) {
 }
 
 chromosome_t mutation_one_point(const chromosome_t parent, double p_mutation) {
-    using namespace std;
     uniform_real_distribution<double> uni(0.0,1.0);
-    if (uni(mt_generator) < p_mutation) {
+    if (uni(mt_generator) <= p_mutation) {
         uniform_int_distribution<int> locus(0,parent.size()-1);
         chromosome_t child = parent;
-        auto l = locus(mt_generator);
-        child[l] = 1 - child[l];
+        int l = locus(mt_generator);
+        child[l] = child[l] == 0;
         return child;
     }else
         return parent;
@@ -148,24 +145,38 @@ void print_population(population_t population, fitness_f fitness){
     }
 }
 
-population_t test(population_t population, int iterations, double p_crossover, double p_mutation, int print_switch){
-    auto result = genetic_algorithm(population,
-                                    get_fitness_f,
-                                    [iterations](auto a, auto b) {
-                                        static int i = 1;
-                                        i++;
-                                        return i > iterations;
-                                        },
-                                    selection_tournament_2,
-                                    p_crossover, crossover_two_point,
-                                    p_mutation, mutation_one_point);
-    return result;
+double standard_deviation_f(const vector<double>& fitnesses) {
+    double avg = 0.0, deviation = 0.0;
+    for(double fitness : fitnesses){
+        avg += fitness;
+    }
+    avg = avg / fitnesses.size();
+    for(double fitness : fitnesses){
+        deviation += pow((fitness - avg), 2);
+    }
+    return sqrt(deviation/fitnesses.size());
+}
+
+void print_population_stats(population_t population, fitness_f fitness){
+    double min = 100, max = 0, avg = 0, temp;
+    for (chromosome_t chromosome: population){
+        temp = fitness(chromosome);
+        avg += temp;
+        if (temp > max){
+            max = temp;
+        }
+        if(temp < min){
+            min = temp;
+        }
+    }
+    avg = avg / population.size();
+    cout << "min: " << min << " max: " << max << " avg: " << avg << endl;
 }
 
 int main() {
     int population_size, iterations, print_switch;
-    double p_crossover, p_mutation;
-    cout << "Population size:";
+    double p_crossover, p_mutation, standard_deviation;
+    cout << "Population size (even):";
     cin >> population_size;
     cout << "Iterations:";
     cin >> iterations;
@@ -175,10 +186,30 @@ int main() {
     cin >> p_mutation;
     cout << "Print (1/0):";
     cin >> print_switch;
+    cout << "Standard deviation (0 for none):";
+    cin >> standard_deviation;
 
     population_t population = generate_population(population_size, 110); // 100 + (22835 % 10) * 2) = 110
     print_population(population, get_fitness_f);
-    print_population(test(population, iterations, p_crossover, p_mutation, print_switch), get_fitness_f);
+    population_t result = genetic_algorithm(population,
+                                                 get_fitness_f,
+                                                 [iterations, standard_deviation](auto a, auto b) {
+                                                     static int i = 0;
+                                                     if(standard_deviation_f(b) < standard_deviation){
+                                                         cout << "Standard deviation limit reached after: " << i << " iterations";
+                                                         return true;
+                                                     }
+                                                     i++;
+                                                     return i > iterations;
+                                                 },
+                                                 selection_tournament_2,
+                                                 p_crossover, crossover_two_point,
+                                                 p_mutation, mutation_one_point);
+    print_population(result, get_fitness_f);
+    if(print_switch){
+        print_population_stats(population, get_fitness_f);
+        print_population_stats(result, get_fitness_f);
+    }
 
     return 0;
 }

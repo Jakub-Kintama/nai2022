@@ -151,7 +151,12 @@ void print_population(population_t population, fitness_f fitness){
 population_t test(population_t population, int iterations, double p_crossover, double p_mutation, int print_switch){
     auto result = genetic_algorithm(population,
                                     get_fitness_f,
-                                    [](auto a, auto b) { return true; },
+                                    [iterations](auto a, auto b) {
+                                        static int i = 1;
+                                        i++;
+                                        // cout << i << ": " << make_pair(a, fitness_function) << endl;
+                                        return i > iterations;
+                                        },
                                     selection_tournament_2,
                                     p_crossover, crossover_two_point,
                                     p_mutation, mutation_one_point);

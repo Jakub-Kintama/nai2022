@@ -4,6 +4,9 @@
 #include <functional>
 #include <random>
 #include <cmath>
+#include <algorithm>
+#include <string>
+
 using namespace std;
 
 random_device rd;
@@ -108,7 +111,7 @@ pair<double, double> decode(chromosome_t chromosome) {
 
 auto get_fitness_f = [](chromosome_t chromosome){
     pair<double, double> pair = decode(chromosome);
-    return 1.0 / 1.0 + abs(ackley_f(pair.first, pair.second));
+    return 1.0 / (1.0 + abs(ackley_f(pair.first, pair.second)));
 };
 
 chromosome_t generate_chromosome(int chromosome_size){
@@ -159,23 +162,28 @@ double standard_deviation_f(const vector<double>& fitnesses) {
 
 void print_population_stats(population_t population, fitness_f fitness){
     double min = 100, max = 0, avg = 0, temp;
+    pair <double, double> minp, maxp;
     for (chromosome_t chromosome: population){
         temp = fitness(chromosome);
         avg += temp;
         if (temp > max){
             max = temp;
+            maxp = decode(chromosome);
         }
         if(temp < min){
             min = temp;
+            minp = decode(chromosome);
         }
     }
     avg = avg / population.size();
-    cout << "min: " << min << " max: " << max << " avg: " << avg << endl;
+    cout << "min " << min << " for x=" << minp.first << " y=" << minp.second << ", max: " << max << " for x=" << maxp.first << " y=" << maxp.second << ", avg: " << avg << endl;
 }
 
-int main() {
-    int population_size, iterations, print_switch;
-    double p_crossover, p_mutation, standard_deviation;
+int main(int argc, char *argv[]) {
+    int population_size=stoi(argv[1]), iterations=stoi(argv[2]), print_switch=stoi(argv[5]);
+    double p_crossover=stod(argv[3]), p_mutation=stod(argv[4]), standard_deviation=stod(argv[6]);
+
+    /*
     cout << "Population size (even):";
     cin >> population_size;
     cout << "Iterations:";
@@ -188,6 +196,7 @@ int main() {
     cin >> print_switch;
     cout << "Standard deviation (0 for none):";
     cin >> standard_deviation;
+    */
 
     population_t population = generate_population(population_size, 110); // 100 + (22835 % 10) * 2) = 110
     print_population(population, get_fitness_f);
